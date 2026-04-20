@@ -25,7 +25,7 @@ This guide is written for the project supervisor. It takes you from a fresh Ubun
 ## Step 1 — Get the code
 
 ```bash
-git clone https://github.com/ShubhankarBhattacharya/causaltrace.git
+git clone https://github.com/N3trunneR404/causaltrace.git
 cd causaltrace
 ```
 

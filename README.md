@@ -76,7 +76,7 @@ Everything below can be copy-pasted into a terminal running as a user with `sudo
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/ShubhankarBhattacharya/causaltrace.git
+git clone https://github.com/N3trunneR404/causaltrace.git
 cd causaltrace
 ```
 
