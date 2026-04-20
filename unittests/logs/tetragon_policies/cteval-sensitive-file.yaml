@@ -1,0 +1,16 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: cteval-sensitive-file
+spec:
+  kprobes:
+  - call: "__x64_sys_openat"
+    syscall: true
+    args:
+    - index: 1
+      type: "string"
+    selectors:
+    - matchArgs:
+      - index: 1
+        operator: "Prefix"
+        values: ["/etc/shadow", "/etc/passwd", "/proc/1/", "/var/run/secrets"]

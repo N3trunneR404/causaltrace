@@ -1,0 +1,307 @@
+# docker-compose.yml — CausalTrace Phase 12 testbed
+# 20 production microservices on ct_prod_net (10.88.0.0/24)
+# ct_legit_client (wrk)  on ct_prod_net  at 10.88.0.100  → earns trust=2 during calibration
+# ct_attacker          on ct_attack_net at 10.88.1.100   → trust=0 at runtime
+#
+# IPv6 disabled everywhere (Probe B only hooks tcp_v4_connect).
+# Masquerade disabled on both bridges so cross-bridge packets retain source IP.
+# Inter-bridge forwarding enabled by scripts/setup_routes.sh (called from Makefile up target).
+
+x-svc-caps: &svc-caps
+  security_opt:
+    - seccomp:unconfined
+  cap_add:
+    - SYS_PTRACE
+    - NET_ADMIN
+    - SYS_ADMIN
+
+networks:
+  ct_prod_net:
+    name: ct_prod_net
+    driver: bridge
+    enable_ipv6: false
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+    ipam:
+      config:
+        - subnet: 10.88.0.0/24
+          gateway: 10.88.0.1
+
+  ct_attack_net:
+    name: ct_attack_net
+    driver: bridge
+    enable_ipv6: false
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+    ipam:
+      config:
+        - subnet: 10.88.1.0/24
+          gateway: 10.88.1.1
+
+services:
+  # ───────────────── Edge / HTTP tier (3) ─────────────────
+  ct-nginx:
+    image: nginx:1.25-alpine
+    container_name: ct-nginx
+    hostname: ct-nginx
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.10}}
+    ports: ["8080:80"]
+    volumes:
+      - ./testbed-production/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    <<: *svc-caps
+    depends_on: [ct-webapp-a, ct-webapp-b]
+    restart: unless-stopped
+
+  ct-webapp-a:
+    build: ./testbed-production/services
+    container_name: ct-webapp-a
+    hostname: ct-webapp-a
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.11}}
+    environment:
+      APP_NAME: webapp-a
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.13:8080,10.88.0.20:6379"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-webapp-b:
+    build: ./testbed-production/services
+    container_name: ct-webapp-b
+    hostname: ct-webapp-b
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.12}}
+    environment:
+      APP_NAME: webapp-b
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.13:8080,10.88.0.20:6379"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  # ───────────────── Core application tier (7) ─────────────────
+  ct-api-gw:
+    build: ./testbed-production/services
+    container_name: ct-api-gw
+    hostname: ct-api-gw
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.13}}
+    environment:
+      APP_NAME: api-gateway
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.14:8080,10.88.0.16:8080,10.88.0.17:8080,10.88.0.18:8080,10.88.0.23:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-product:
+    build: ./testbed-production/services
+    container_name: ct-product
+    hostname: ct-product
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.14}}
+    environment:
+      APP_NAME: product-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.21:5432,10.88.0.20:6379,10.88.0.24:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-inventory:
+    build: ./testbed-production/services
+    container_name: ct-inventory
+    hostname: ct-inventory
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.15}}
+    environment:
+      APP_NAME: inventory-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.21:5432,10.88.0.19:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-order:
+    build: ./testbed-production/services
+    container_name: ct-order
+    hostname: ct-order
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.16}}
+    environment:
+      APP_NAME: order-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.17:8080,10.88.0.15:8080,10.88.0.22:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-payment:
+    build: ./testbed-production/services
+    container_name: ct-payment
+    hostname: ct-payment
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.17}}
+    environment:
+      APP_NAME: payment-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.21:5432,10.88.0.18:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-user:
+    build: ./testbed-production/services
+    container_name: ct-user
+    hostname: ct-user
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.18}}
+    environment:
+      APP_NAME: user-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.21:5432,10.88.0.23:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-notification:
+    build: ./testbed-production/services
+    container_name: ct-notification
+    hostname: ct-notification
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.19}}
+    environment:
+      APP_NAME: notification-svc
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.26:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  # ───────────────── Data tier (2) ─────────────────
+  ct-redis:
+    image: redis:7-alpine
+    container_name: ct-redis
+    hostname: ct-redis
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.20}}
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-postgres:
+    image: postgres:15-alpine
+    container_name: ct-postgres
+    hostname: ct-postgres
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.21}}
+    environment:
+      POSTGRES_DB: appdb
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppass_2026
+    <<: *svc-caps
+    restart: unless-stopped
+
+  # ───────────────── Supporting services (6) ─────────────────
+  ct-cart:
+    build: ./testbed-production/services
+    container_name: ct-cart
+    hostname: ct-cart
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.22}}
+    environment:
+      APP_NAME: cart-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.20:6379,10.88.0.14:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-auth:
+    build: ./testbed-production/services
+    container_name: ct-auth
+    hostname: ct-auth
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.23}}
+    environment:
+      APP_NAME: auth-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.21:5432,10.88.0.26:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-search:
+    build: ./testbed-production/services
+    container_name: ct-search
+    hostname: ct-search
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.24}}
+    environment:
+      APP_NAME: search-service
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.14:8080,10.88.0.20:6379"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-analytics:
+    build: ./testbed-production/services
+    container_name: ct-analytics
+    hostname: ct-analytics
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.25}}
+    environment:
+      APP_NAME: analytics-svc
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.21:5432,10.88.0.26:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-logger:
+    build: ./testbed-production/services
+    container_name: ct-logger
+    hostname: ct-logger
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.26}}
+    environment:
+      APP_NAME: logger-svc
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.21:5432"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-metrics:
+    build: ./testbed-production/services
+    container_name: ct-metrics
+    hostname: ct-metrics
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.27}}
+    environment:
+      APP_NAME: metrics-collector
+      APP_PORT: "8080"
+      UPSTREAM_CALLS: "10.88.0.28:9090,10.88.0.11:8080,10.88.0.13:8080"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  # ───────────────── Observability (2) ─────────────────
+  ct-prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: ct-prometheus
+    hostname: ct-prometheus
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.28}}
+    <<: *svc-caps
+    restart: unless-stopped
+
+  ct-grafana:
+    image: grafana/grafana:10.1.0
+    container_name: ct-grafana
+    hostname: ct-grafana
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.29}}
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+    <<: *svc-caps
+    restart: unless-stopped
+
+  # ───────────────── Legitimate user traffic generator ─────────────────
+  ct_legit_client:
+    image: williamyeh/wrk
+    container_name: ct_legit_client
+    hostname: ct_legit_client
+    networks: {ct_prod_net: {ipv4_address: 10.88.0.100}}
+    entrypoint: ["sh", "-c"]
+    command: >
+      "while true; do
+         wrk -t2 -c10 -d25s --latency http://10.88.0.10/ >/dev/null 2>&1 || true;
+         sleep 3;
+       done"
+    restart: unless-stopped
+
+  # ───────────────── Attacker persona ─────────────────
+  ct_attacker:
+    build: ./testbed-production/attacker-shell
+    container_name: ct_attacker
+    hostname: ct_attacker
+    networks: {ct_attack_net: {ipv4_address: 10.88.1.100}}
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./attacks:/attacks:ro
+    tty: true
+    stdin_open: true
+    restart: unless-stopped

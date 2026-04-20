@@ -1,0 +1,946 @@
+{
+  "completed_phases": [
+    "phase1",
+    "phase2",
+    "phase3",
+    "phase4"
+  ],
+  "attack_sequence": [],
+  "phase1_end_ts": 1776599961.0915105,
+  "attack_sequence_fast": [
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S10",
+      "script": "scenario_10_container_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S11",
+      "script": "scenario_11_fileless_memfd.sh",
+      "delay_s": 20.0,
+      "is_ood": true
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S11",
+      "script": "scenario_11_fileless_memfd.sh",
+      "delay_s": 20.0,
+      "is_ood": true
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S10",
+      "script": "scenario_10_container_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S10",
+      "script": "scenario_10_container_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S11",
+      "script": "scenario_11_fileless_memfd.sh",
+      "delay_s": 20.0,
+      "is_ood": true
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S10",
+      "script": "scenario_10_container_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S10",
+      "script": "scenario_10_container_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S11",
+      "script": "scenario_11_fileless_memfd.sh",
+      "delay_s": 20.0,
+      "is_ood": true
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S11",
+      "script": "scenario_11_fileless_memfd.sh",
+      "delay_s": 20.0,
+      "is_ood": true
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S4",
+      "script": "scenario_4_fork_bomb.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S8",
+      "script": "scenario_8_log4shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S10",
+      "script": "scenario_10_container_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S7",
+      "script": "scenario_7_cross_container.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S9",
+      "script": "scenario_9_ssrf_rce.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2a",
+      "script": "scenario_2a_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S2",
+      "script": "scenario_2_reverse_shell.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S5",
+      "script": "scenario_5_ns_escape.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S6",
+      "script": "scenario_6_privesc.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3a",
+      "script": "scenario_3_evade.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    },
+    {
+      "attack_id": "S3",
+      "script": "scenario_3_sensitive_file.sh",
+      "delay_s": 20.0,
+      "is_ood": false
+    }
+  ],
+  "phase2_start_ts": 1776599969.0931354,
+  "phase2_end_ts": 1776603963.296193,
+  "phase3_end_ts": 1776611940.2386403,
+  "phase4_end_ts": 1776619924.2149563
+}

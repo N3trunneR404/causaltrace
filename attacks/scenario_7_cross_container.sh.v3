@@ -1,0 +1,58 @@
+#!/bin/bash
+# Scenario 7: Cross-Container Lateral Movement
+# THE KEY DIFFERENTIATOR — only CausalTrace detects this.
+# Neither Baseline A nor Baseline B can detect cross-container attacks.
+#
+# Attack chain:
+#   1. Shell spawn in ct-web → bit0 (BIT_SHELL_SPAWN) set
+#   2. Lateral connect from ct-web to ct-api on port 9999 (uncalibrated)
+#   3. Probe B two-hop: (now - bit_ts[0]) < 5s AND (flags & BIT_SHELL_SPAWN) → SIGKILL
+#   4. Tier 3 novel-edge: (ct-web, ct-api, 9999) not in calibrated_edges → HIGH
+#   5. Sheaf Laplacian: bigram shift in ct-web → edge energy spike
+#
+# Expected: ALERT_TWO_HOP + Novel Edge + Sheaf anomaly
+set -e
+echo "=== SCENARIO 7: Cross-Container Lateral Movement ==="
+echo "This is the scenario that only CausalTrace can detect."
+echo ""
+
+# Step 1: Start a listener on ct-api port 9999 (uncalibrated port)
+echo "[Step 1] Starting listener on ct-api:9999..."
+docker exec -d ct-api nc -l -p 9999
+
+sleep 1
+
+# Step 2: Spawn shell and connect laterally from ct-web to ct-api
+echo "[Step 2] Shell spawn + lateral connection from ct-web → ct-api:9999..."
+docker exec ct-web /bin/sh -c "
+    echo 'Shell spawned in ct-web'
+    # Lateral connection to ct-api on uncalibrated port 9999
+    echo 'lateral-probe' | nc -w 3 10.88.0.20 9999 2>/dev/null
+    echo 'Connection attempted'
+" 2>&1 || true
+echo "  Exit code: $? (137 = SIGKILL from two-hop invariant or verdict_map)"
+
+sleep 2
+
+# Step 3: Attempt full lateral chain (Web → API → DB)
+echo "[Step 3] Full lateral chain: ct-web → ct-api → ct-db..."
+docker exec -d ct-db nc -l -p 9998
+sleep 0.5
+
+docker exec ct-web /bin/sh -c "
+    echo 'probe' | nc -w 2 10.88.0.20 9999 2>/dev/null
+" 2>&1 || true
+
+docker exec ct-api /bin/sh -c "
+    echo 'probe' | nc -w 2 10.88.0.30 9998 2>/dev/null
+" 2>&1 || true
+
+echo ""
+echo "Detection layers that should fire:"
+echo "  Tier 1: handler_execve → BIT_SHELL_SPAWN, bit_ts[0] set"
+echo "  Tier 2: probe_b two-hop → (bit0 recent + lateral connect) → ALERT_TWO_HOP + SIGKILL"
+echo "  Tier 3: novel-edge → (ct-web, ct-api, 9999) not calibrated → HIGH"
+echo "  Tier 3: sheaf → bigram shift in ct-web → edge energy above threshold"
+echo "  Semantic: bit0 + bit1 → 'Shell spawn with lateral connection' → T1059 + T1021"
+echo ""
+echo "=== Scenario 7 complete ==="

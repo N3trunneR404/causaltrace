@@ -1,0 +1,317 @@
+\chapter{Theoretical Framework}
+\label{Chapter3}
+\lhead{Chapter 3. \emph{Theoretical Framework}}
+
+The Tier~3 detector runs a small mathematical pipeline every detection
+cycle: a bigram sketch becomes a 74-dimensional signal, the signal is
+projected into an edge-local coupling subspace by a CCA-learned restriction
+map, Mahalanobis energy scores the edge, and a global Rayleigh quotient
+over a cellular sheaf Laplacian scores the whole container graph. A guarded
+exponential moving average keeps the global threshold honest under normal
+drift without letting a slow-drip attack poison it.
+
+We state the classical pieces as given and cite primary
+sources~\cite{hotelling1936,mahalanobis1936,hansen2019spectral,curry2014sheaves,robinson2014topological,chung1997spectral}.
+No new mathematics about these objects is claimed. The contribution of this
+chapter is the assembly into a deployable detector and the four theorems in
+Section~\ref{sec:theorems}, which capture why that assembly is hard to
+evade.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Notation}
+\label{sec:notation}
+%─────────────────────────────────────────────────────────────────────────────
+
+$C = \{c_1, \ldots, c_n\}$ is the set of monitored containers, each with
+cgroup identifier $g_i \in \mathbb{N}$. A detection cycle is a window of
+length $T$ indexed by $t$. At cycle $t$ each container produces a signal
+$\mathbf{x}_i^{(t)} \in \mathbb{R}^d$ with $d = 74$. The communication graph
+$G = (V, E)$ has $V = C$ and $E$ the set of observed inter-container edges;
+we write $e = (u, v, \ell)$ with $\ell \in \{0,1,2\}$ encoding the temporal
+lag. After calibration every edge carries restriction maps
+$F_u^{(e)}, F_v^{(e)} \in \mathbb{R}^{k \times d}$ with $k = 15$, a
+regularised covariance $\Sigma_e \in \mathbb{R}^{k \times k}$, and a
+Mahalanobis threshold $\tau_e$. The global Rayleigh threshold is
+$\tau_{\text{global}}$.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Bigram sketch and the 74-dimensional signal}
+\label{sec:signal}
+%─────────────────────────────────────────────────────────────────────────────
+
+Let $\Sigma$ be the set of top-25 syscall opcodes observed across the
+testbed during calibration (full list in Appendix~\ref{AppendixB}). A
+\emph{bigram} is an ordered pair $(s_i, s_j) \in \Sigma \times \Sigma$
+recording that opcode $s_j$ immediately followed $s_i$ in the same cgroup.
+In-kernel counting uses a Count-Min
+Sketch~\cite{cormode2005cms} with $r{=}4$ rows and $w{=}128$ columns; the
+estimate of the bigram count is $\min_\rho \mathrm{CMS}[\rho][h_\rho(\cdot)
+\bmod w]$. The sketch resets every $T$~seconds, so each cycle observes
+only current traffic.
+
+The reconstructed 625-dimensional bigram vector $\mathbf{b}^{(t)}$ is
+compressed into $\mathbf{x}^{(t)} = \phi(\mathbf{b}^{(t)}) \in \mathbb{R}^{74}$
+through four blocks:
+
+\begin{itemize}
+  \item \textbf{Shannon entropy} (3 dims): marginal entropy of first
+        opcodes, marginal entropy of second opcodes, joint bigram entropy.
+  \item \textbf{PCA} (50 dims): projection onto the top-50 principal
+        components of the calibration bigram set, learned once and
+        frozen.
+  \item \textbf{Top-$k$ marginals} (20 dims): marginal frequencies of the
+        20 most common single syscalls.
+  \item \textbf{Rate} (1 dim): $\log_{10}$ of total syscalls in the
+        window.
+\end{itemize}
+
+The signal is then whitened per container,
+$\tilde{\mathbf{x}}_i^{(t)} = (\mathbf{x}_i^{(t)} - \boldsymbol{\mu}_i)
+\oslash (\mathbf{s}_i + \epsilon)$, with $\epsilon = 10^{-6}$. Diagonal
+whitening is deliberate: a full $74\!\times\!74$ covariance inversion would
+be rank-bounded by the per-container sample count during calibration.
+
+\paragraph{Intuition for the shape.} The entropy block captures
+\emph{disorder} in the syscall stream. The PCA block captures
+\emph{structural pattern} in the bigram sketch. The marginals capture
+\emph{what} the container is doing. The rate captures \emph{how much} it
+is doing. A reverse shell perturbs all four blocks; a fork bomb perturbs
+the rate and entropy blocks; a cross-container pivot perturbs primarily
+the PCA block. Separating these blocks is what lets the sheaf Laplacian
+find an attack that would be invisible to any single dimension.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{CCA restriction maps per edge}
+\label{sec:cca}
+%─────────────────────────────────────────────────────────────────────────────
+
+Canonical-correlation analysis~\cite{hotelling1936} finds, for aligned
+matrices $X \in \mathbb{R}^{T \times d}$ and $Y \in \mathbb{R}^{T \times d}$,
+linear projections $F_X, F_Y \in \mathbb{R}^{k \times d}$ that maximise the
+correlation between $F_X X^\top$ and $F_Y Y^\top$:
+\begin{equation}
+  (F_X^\star, F_Y^\star) = \operatorname*{arg\,max}_{F_X, F_Y}
+  \frac{\operatorname{tr}\!\bigl(F_X X^\top Y F_Y^\top\bigr)}
+       {\sqrt{\operatorname{tr}(F_X X^\top X F_X^\top)\,\operatorname{tr}(F_Y Y^\top Y F_Y^\top)}}.
+  \label{eq:cca}
+\end{equation}
+The solution is a generalised eigendecomposition of the joint covariance
+matrix; closed forms are in the primary source. For every observed edge
+$e = (u, v, \ell)$ we form aligned calibration matrices
+$X_u^{(\ell)} = [\tilde{\mathbf{x}}_u^{(1)}, \ldots,
+\tilde{\mathbf{x}}_u^{(T-\ell)}]^\top$ and
+$X_v^{(\ell)} = [\tilde{\mathbf{x}}_v^{(1+\ell)}, \ldots,
+\tilde{\mathbf{x}}_v^{(T)}]^\top$, and solve~\eqref{eq:cca} to obtain
+$F_u^{(e)}, F_v^{(e)}$. Three lags per edge are calibrated.
+
+\paragraph{Why $k = 15$ and not $k = 50$.}  The CCA solution is only stable
+when the per-edge aligned sample count exceeds a rank-dependent floor
+(roughly $4k$ in our regularised implementation). An early iteration used
+$k = 50$ and required $\approx 60$ aligned samples per edge---a floor that
+realistic calibration windows could not always meet because inter-container
+activity alignment is lossy. At $k = 15$ the floor drops to $\approx 25$
+aligned samples; every edge observed in our testbed calibrates cleanly.
+Section~\ref{sec:cal-output} reports that $k = 15$ retains more than 90\%
+of the explained inter-container correlation.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Mahalanobis edge energy}
+\label{sec:mahal}
+%─────────────────────────────────────────────────────────────────────────────
+
+At runtime cycle $t$ the residual on edge $e = (u, v, \ell)$ is
+$\mathbf{r}_e^{(t)} = F_u^{(e)} \tilde{\mathbf{x}}_u^{(t)} - F_v^{(e)}
+\tilde{\mathbf{x}}_v^{(t+\ell)} \in \mathbb{R}^k$. Under the
+calibrated-coupling null, $\mathbf{r}_e^{(t)}$ is zero-mean Gaussian in the
+shared subspace. We estimate its covariance with Tikhonov regularisation:
+\[
+  \hat\Sigma_e = \frac{1}{T-1}\sum_{\tau=1}^{T}
+  \mathbf{r}_e^{(\tau)}\bigl(\mathbf{r}_e^{(\tau)}\bigr)^{\!\top}
+  + \epsilon_\Sigma I_k, \quad \epsilon_\Sigma = 10^{-6}.
+\]
+The \emph{edge energy} is the Mahalanobis distance~\cite{mahalanobis1936}:
+\begin{equation}
+  E_e(t) = \bigl(\mathbf{r}_e^{(t)}\bigr)^{\!\top} \hat\Sigma_e^{-1} \mathbf{r}_e^{(t)}.
+  \label{eq:mahal}
+\end{equation}
+Under the null $E_e \sim \chi_k^2$; for $k{=}15$ the mean is $15$ and the
+$99\%$ tail is $\approx 30.6$. The per-edge threshold is $\tau_e = \hat\mu_e
++ 4\hat\sigma_e$.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Cellular sheaf Laplacian and Rayleigh quotient}
+\label{sec:sheaf}
+%─────────────────────────────────────────────────────────────────────────────
+
+A cellular sheaf $\mathcal{F}$ on $G = (V, E)$ assigns a vector space
+$\mathcal{F}(v) = \mathbb{R}^{d}$ to each vertex, a vector space
+$\mathcal{F}(e) = \mathbb{R}^{k}$ to each edge, and a linear restriction
+$\mathcal{F}_{v \triangleleft e} : \mathcal{F}(v) \to \mathcal{F}(e)$ to
+every incident pair. The coboundary $\delta$ acts on an edge $(u, v)$ by
+$(\delta \mathbf{x})_e = F_u^{(e)} \mathbf{x}_u - F_v^{(e)} \mathbf{x}_v$.
+The \emph{sheaf Laplacian} is
+\begin{equation}
+  L_\mathcal{F} = \delta^{\!\top}\!\delta \in \mathbb{R}^{nd \times nd}.
+  \label{eq:sheaf-laplacian}
+\end{equation}
+The diagonal block for vertex $v$ is $\sum_{e \colon v \triangleleft
+e}(F_v^{(e)})^{\!\top} F_v^{(e)}$; the off-diagonal block for $(u,v)$
+incident at edge $e$ is $-(F_u^{(e)})^{\!\top} F_v^{(e)}$. When every
+restriction is the identity, $L_\mathcal{F}$ reduces to the ordinary graph
+Laplacian~\cite{chung1997spectral}.
+
+\paragraph{Intuition.}  Think of each container as a point in its own
+74-dimensional configuration space, and each CCA restriction as the pair
+of projection lenses that edge uses to see its two endpoints. If both
+endpoints project onto the same point in the shared 15-dimensional
+subspace, the edge is \emph{happy}. If they disagree, the edge has
+\emph{tension}. The sheaf Laplacian sums tension across all edges. A low
+Rayleigh quotient means the graph is at rest; a high one means the
+coupling is being violated.
+
+The global Rayleigh quotient is
+\begin{equation}
+  R(\mathbf{x}) = \frac{\mathbf{x}^{\!\top} L_\mathcal{F}\, \mathbf{x}}{\mathbf{x}^{\!\top} \mathbf{x}}
+  = \frac{\sum_{e = (u,v) \in E} \|F_u^{(e)} \mathbf{x}_u - F_v^{(e)} \mathbf{x}_v\|_2^2}
+         {\|\mathbf{x}\|_2^2}.
+  \label{eq:rayleigh}
+\end{equation}
+We set $\tau_{\text{global}} = \hat\mu_R + 4\hat\sigma_R$ at calibration and
+fire the global gate when $R > \tau_{\text{global}}$.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Guarded exponential moving average}
+\label{sec:ema}
+%─────────────────────────────────────────────────────────────────────────────
+
+A naive EMA adapts the threshold to current observations but has one fatal
+mode: a slow-drip attack that never exceeds the instantaneous threshold
+poisons the average into following the attack. Let $s^{(t)} \in \{0, 1\}$
+indicate whether cycle $t$ was pristine (no behaviour bit fired, no edge
+energy exceeded $\tau_e$, no alert in the ring buffer) and let $p^{(t)} =
+\sum_{\tau = t-5}^{t} s^{(\tau)}$ be the pristine-streak length over the
+last six cycles. The guarded update is
+\begin{equation}
+  \tau^{(t)} =
+  \begin{cases}
+    \alpha R^{(t)} + (1 - \alpha)\tau^{(t-1)} & \text{if } p^{(t)} = 6, \\[1mm]
+    \tau^{(t-1)} & \text{otherwise}.
+  \end{cases}
+  \label{eq:guarded-ema}
+\end{equation}
+Any suspected anomaly freezes the threshold. We use $\alpha = 0.02$, giving
+an effective half-life of roughly $34$ pristine cycles---slow enough to
+track legitimate drift, fast enough to recover after a clean recovery
+window.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Evasion resistance: four theorems}
+\label{sec:theorems}
+%─────────────────────────────────────────────────────────────────────────────
+
+The design of CausalTrace rests on four defensible claims. Each theorem
+answers a specific question a reviewer or a panel member would raise. The
+proofs are informal because each relies on a kernel-observable mechanism
+rather than a closed-form reduction; the citations point to the kernel or
+userspace file that realises the mechanism.
+
+\begin{theorem}[Invariant necessity]\label{thm:invariant}
+Let $\mathcal{A}_{\text{I}} \subseteq \mathcal{A}$ be the set of attack
+classes that require the attacker to emit a specific syscall pattern $\pi$
+to succeed (for example, an interactive reverse shell requires
+$\mathrm{dup2}(\texttt{sockfd}, k)$ for some $k \in \{0,1,2\}$). For every
+$\alpha \in \mathcal{A}_{\text{I}}$, a kernel hook observing $\pi$ achieves
+recall $= 1$: the attacker cannot complete $\alpha$ without the hook
+firing. Table~\ref{tab:invariants} maps each scenario to its invariant.
+\end{theorem}
+
+\begin{theorem}[Bigram-noise adversarial closure]\label{thm:bigram}
+Let $N$ be the noise-syscall whitelist filtered before the bigram update
+(Section~\ref{sec:signal}). An adversary attempting to dilute the
+bigram-count vector during an attack faces a dichotomy:
+\begin{enumerate}
+  \item \textit{Emit syscalls in $N$.} These are filtered at the kernel and
+  contribute nothing to the sketch. They cost CPU and nothing else.
+  \item \textit{Emit syscalls outside $N$.} Each such syscall produces a
+  bigram $(\mathrm{prev}, s)$ whose probability under the calibrated model
+  is low (it was not seen during calibration). The resulting
+  $\tilde{\mathbf{x}}^{(t)}$ moves farther from the calibrated mean, the
+  Mahalanobis edge energy~\eqref{eq:mahal} rises, and the sheaf Rayleigh
+  quotient rises with it.
+\end{enumerate}
+The attacker has no noise-channel at the bigram layer: every evasion
+attempt triggers the statistics.
+\end{theorem}
+
+\begin{theorem}[Two-layer completeness]\label{thm:completeness}
+Partition the attack space as $\mathcal{A} = \mathcal{A}_{\text{I}} \cup
+\mathcal{A}_{\text{U}}$, where $\mathcal{A}_{\text{U}}$ is the set of novel
+attacks without a pre-enumerated kernel invariant. Theorem~\ref{thm:invariant}
+gives Tier~1 recall $= 1$ on $\mathcal{A}_{\text{I}}$. Tier~3 achieves
+recall $\geq 1 - \beta$ on $\mathcal{A}_{\text{U}}$, where $\beta$ is
+controlled by the per-edge false-positive rate $\Pr[E_e > \tau_e \mid
+\text{null}]$ and the $4\sigma$ gate in Sections~\ref{sec:mahal}
+and~\ref{sec:sheaf}. The composition covers $\mathcal{A}$ with detection
+rate bounded below by the invariant coverage on the known set and the
+sheaf's statistical power on the novel set.
+\end{theorem}
+
+\begin{theorem}[Trust-promotion soundness]\label{thm:trust}
+Let $B = 5120$ bytes and $\Delta = 1$~second be the L4-stability gate for
+trust promotion (Chapter~\ref{Chapter4}, Section~\ref{sec:trust-model}). A
+client IP reaches \textsc{Calibrated} only after a single TCP flow
+accumulates at least $B$ bytes over at least $\Delta$ seconds. An attacker
+whose entire session budget is under $B$ bytes cannot promote, and
+therefore cannot bypass Case~A enforcement; a burst attacker who fires and
+disconnects before $\Delta$ elapses is always routed through the
+untrusted path.
+\end{theorem}
+
+\begin{remark}[Unforgeable attribution]\label{rem:attribution}
+The per-TID client-IP map is populated by the \texttt{inet\_csk\_accept}
+kretprobe using kernel-owned \texttt{struct sock} fields. No userspace
+write path exists to this map; an attacker cannot spoof a client-IP entry
+without kernel-level privilege escalation, which is outside the threat
+model of Chapter~\ref{Chapter4}.
+\end{remark}
+
+\paragraph{What we do \emph{not} prove.}  The sheaf detector's
+$\beta$ in Theorem~\ref{thm:completeness} is an empirical quantity---we do
+not claim a closed-form upper bound. We do not claim that
+Theorem~\ref{thm:invariant} holds for attack classes that a future kernel
+may allow through new syscalls not yet in $\Sigma$. Theorem~\ref{thm:trust}
+assumes the attacker cannot fabricate TCP traffic on the defender's behalf,
+which holds as long as the defender's veth is the only way into the
+container.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Math-to-code mapping}
+\label{sec:math-map}
+%─────────────────────────────────────────────────────────────────────────────
+
+\begin{table}[h]
+\centering
+\caption[Math-to-code mapping]{Where each mathematical object is realised
+in the codebase.}
+\label{tab:math-map}
+\small
+\begin{tabular}{lll}
+\toprule
+Object / equation & Kernel side & Userspace side \\
+\midrule
+Bigram CMS, $4 \times 128$                       & \texttt{kernel/causaltrace\_bcc.c:613} & \texttt{tier3/signal\_extractor.py} \\
+Signal extraction $\phi$, $d{=}74$               & --- & \texttt{tier3/signal\_extractor.py} \\
+Per-container whitening                          & --- & \texttt{tier3/whitener.py} \\
+CCA restriction maps~\eqref{eq:cca}              & --- & \texttt{tier3/calibrate.py} \\
+Mahalanobis energy~\eqref{eq:mahal}              & --- & \texttt{tier3/sheaf\_detector.py} \\
+Sheaf Laplacian~\eqref{eq:sheaf-laplacian}       & --- & \texttt{tier3/sheaf\_detector.py} \\
+Rayleigh quotient~\eqref{eq:rayleigh}            & --- & \texttt{tier3/sheaf\_detector.py} \\
+Guarded EMA~\eqref{eq:guarded-ema}               & --- & \texttt{tier3/ema\_buffer.py} \\
+Invariant hooks (Thm.~\ref{thm:invariant})       & \texttt{kernel/causaltrace\_bcc.c} & --- \\
+Trust FSM (Thm.~\ref{thm:trust})                 & \texttt{kernel/causaltrace\_bcc.c:459} & \texttt{tier3/trust\_promoter.py} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The per-scenario invariant map (Table~\ref{tab:invariants}) is deferred to
+Chapter~\ref{Chapter4} where the full attack catalogue is introduced.

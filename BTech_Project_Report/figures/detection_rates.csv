@@ -1,0 +1,66 @@
+tool,scenario,hits,total,rate,ci_low,ci_high
+CausalTrace,S2,14,14,1.000,0.785,1.000
+CausalTrace,S2a,18,18,1.000,0.824,1.000
+CausalTrace,S3a,19,19,1.000,0.832,1.000
+CausalTrace,S3,17,18,0.944,0.742,0.990
+CausalTrace,S4,9,9,1.000,0.701,1.000
+CausalTrace,S5,13,13,1.000,0.772,1.000
+CausalTrace,S6,16,16,1.000,0.806,1.000
+CausalTrace,S7,9,9,1.000,0.701,1.000
+CausalTrace,S8,12,12,1.000,0.757,1.000
+CausalTrace,S9,16,16,1.000,0.806,1.000
+CausalTrace,S10,6,6,1.000,0.610,1.000
+CausalTrace,S11,5,5,1.000,0.566,1.000
+Falco (stock),S2,14,14,1.000,0.785,1.000
+Falco (stock),S2a,18,18,1.000,0.824,1.000
+Falco (stock),S3a,19,19,1.000,0.832,1.000
+Falco (stock),S3,18,18,1.000,0.824,1.000
+Falco (stock),S4,2,9,0.222,0.063,0.547
+Falco (stock),S5,6,13,0.462,0.232,0.709
+Falco (stock),S6,7,16,0.438,0.231,0.668
+Falco (stock),S7,0,9,0.000,0.000,0.299
+Falco (stock),S8,2,12,0.167,0.047,0.448
+Falco (stock),S9,0,16,0.000,0.000,0.194
+Falco (stock),S10,0,6,0.000,0.000,0.390
+Falco (stock),S11,3,5,0.600,0.231,0.882
+Falco (tuned),S2,14,14,1.000,0.785,1.000
+Falco (tuned),S2a,18,18,1.000,0.824,1.000
+Falco (tuned),S3a,19,19,1.000,0.832,1.000
+Falco (tuned),S3,18,18,1.000,0.824,1.000
+Falco (tuned),S4,3,9,0.333,0.121,0.646
+Falco (tuned),S5,7,13,0.538,0.291,0.768
+Falco (tuned),S6,16,16,1.000,0.806,1.000
+Falco (tuned),S7,0,9,0.000,0.000,0.299
+Falco (tuned),S8,5,12,0.417,0.193,0.680
+Falco (tuned),S9,0,16,0.000,0.000,0.194
+Falco (tuned),S10,6,6,1.000,0.610,1.000
+Falco (tuned),S11,3,5,0.600,0.231,0.882
+Tetragon (stock),S2,0,14,0.000,0.000,0.215
+Tetragon (stock),S2a,0,18,0.000,0.000,0.176
+Tetragon (stock),S3a,0,19,0.000,0.000,0.168
+Tetragon (stock),S3,0,18,0.000,0.000,0.176
+Tetragon (stock),S4,0,9,0.000,0.000,0.299
+Tetragon (stock),S5,0,13,0.000,0.000,0.228
+Tetragon (stock),S6,0,16,0.000,0.000,0.194
+Tetragon (stock),S7,0,9,0.000,0.000,0.299
+Tetragon (stock),S8,0,12,0.000,0.000,0.243
+Tetragon (stock),S9,0,16,0.000,0.000,0.194
+Tetragon (stock),S10,0,6,0.000,0.000,0.390
+Tetragon (stock),S11,0,5,0.000,0.000,0.434
+Tetragon (tuned),S2,0,14,0.000,0.000,0.215
+Tetragon (tuned),S2a,0,18,0.000,0.000,0.176
+Tetragon (tuned),S3a,0,19,0.000,0.000,0.168
+Tetragon (tuned),S3,2,18,0.111,0.031,0.328
+Tetragon (tuned),S4,0,9,0.000,0.000,0.299
+Tetragon (tuned),S5,0,13,0.000,0.000,0.228
+Tetragon (tuned),S6,0,16,0.000,0.000,0.194
+Tetragon (tuned),S7,0,9,0.000,0.000,0.299
+Tetragon (tuned),S8,0,12,0.000,0.000,0.243
+Tetragon (tuned),S9,0,16,0.000,0.000,0.194
+Tetragon (tuned),S10,0,6,0.000,0.000,0.390
+Tetragon (tuned),S11,0,5,0.000,0.000,0.434
+CausalTrace,TOTAL,154,155,0.994,0.964,0.999
+Falco (stock),TOTAL,89,155,0.574,0.495,0.649
+Falco (tuned),TOTAL,109,155,0.703,0.627,0.770
+Tetragon (stock),TOTAL,0,155,0.000,0.000,0.024
+Tetragon (tuned),TOTAL,2,155,0.013,0.004,0.046

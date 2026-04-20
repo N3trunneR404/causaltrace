@@ -1,0 +1,405 @@
+\documentclass[11pt, a4paper, oneside]{Thesis} % Paper size, default font size and one-sided paper
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{pifont}
+\usepackage{array}
+\usepackage{multirow}
+% theorem / lemma / corollary / remark environments are defined in Thesis.cls
+
+
+%\usepackage{subcaption} %incompatible with subfig
+\usepackage[square, numbers]{natbib} % Use the natbib reference package - read up on this to edit the reference style; if you want text (e.g. Smith et al., 2012) for the in-text references (instead of numbers), remove 'numbers' v
+
+\hypersetup{urlcolor=black, colorlinks=true} % Colors hyperlinks in blue - change to black if annoyingv`	
+\title{\ttitle} % Defines the thesis title - don't touch this
+
+
+
+
+
+%======================================================================|
+%\thesistitle{An Approach to Writing a Thesis\\[3mm] for MDes at IIITDM}
+\thesistitle{CausalTrace: Runtime Container Defense via Kernel Invariants and Sheaf Coupling}
+\degree{B.Tech. Computer Science and Engineering }
+\authors{Shubhankar Bhattacharya \\[-2mm] (Roll No: 122CS0047) \\[2mm]
+         Anmol Kashyap \\[-2mm] (Roll No: 122CS0039)}
+\supervisor{Dr.\ Anil Kumar R \\[-1mm] Assistant Professor (Grade-I)}
+\department{Department of Computer Science and Engineering}
+\DEPARTMENT{Department of Computer Science and Engineering}
+%======================================================================|
+
+
+\tolerance=1
+\emergencystretch=\maxdimen
+\hyphenpenalty=10000
+\hbadness=10000
+
+
+%======================================================================|
+\begin{document}
+\makeatletter
+\renewcommand*{\NAT@nmfmt}[1]{\textsc{#1}}
+\makeatother
+
+% prints author names as small caps
+
+
+\frontmatter % Use roman page numbering style (i, ii, iii, iv...) for the pre-content pages
+
+\setstretch{1.6} % Line spacing of 1.6 (double line spacing)
+
+% Define the page headers using the FancyHdr package and set up for one-sided printing
+\fancyhead{} % Clears all page headers and footers
+\rhead{\thepage} % Sets the right side header to show the page number
+\lhead{} % Clears the left side page header
+
+\pagestyle{fancy} % Finally, use the "fancy" page style to implement the FancyHdr headers
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % New command to make the lines in the title page
+
+% PDF meta-data
+\hypersetup{pdftitle={\ttitle}}
+\hypersetup{pdfsubject=\subjectname}
+\hypersetup{pdfauthor=\authornames}
+\hypersetup{pdfkeywords=\keywordnames}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage}
+\begin{center}
+
+
+%\HRule \\[0.4cm] % Horizontal line
+\vspace{0.4cm} % Horizontal line
+{\huge \bfseries \ttitle}\\[0.4cm] % Thesis title
+%\HRule \\[1.5cm] % Horizontal line
+\vspace{1.5cm} % Horizontal line
+
+ 
+\large \textit{A report submitted in partial fulfilment of the requirements\\ for the award of the degree of \\ B.Tech Computer Science and Engineering }\\[0.3cm] % University requirement text
+\textit{by}\\[0.4cm]
+
+\authornames
+
+\vfill
+\graphicspath{ {./Figures/} }
+\begin{figure}[hb]
+  \centering
+  \includegraphics[width=0.3\linewidth]{klogo.png}
+\end{figure}
+
+\DEPTNAME\\ % Research group name and department name
+\textsc{ \UNIVNAME}\\[1.5cm] % University name
+\large April 2026\\[2cm] % Date
+
+
+\end{center}
+
+\end{titlepage}
+
+%----------------------------------------------------------------------------------------
+%	EVALUATION SHEET
+%----------------------------------------------------------------------------------------
+
+\Evaluation{\addtocontents{toc}{\vspace{1em}}
+
+\vspace{8mm}
+
+\noindent\textbf{Title of the Project:}\\[2mm]
+CausalTrace: Runtime Container Defense via Kernel Invariants and Sheaf
+Coupling
+
+\vspace{8mm}
+
+\noindent\textbf{Name of the Student:}
+\begin{itemize}
+    \item Shubhankar Bhattacharya (Roll No: 122CS0047)\\[-10mm]
+    \item Anmol Kashyap (Roll No: 122CS0039)
+\end{itemize}
+
+\vspace{10mm}
+
+\noindent\textbf{Examiner(s):}\\[2mm]
+\rule{8cm}{0.4pt}
+
+\vspace{10mm}
+
+\noindent\textbf{Supervisor/Advisor:}\\[2mm]
+\rule{8cm}{0.4pt}
+
+\vspace{10mm}
+
+\noindent\textbf{Head of the Department:}\\[2mm]
+\rule{8cm}{0.4pt}
+
+\vspace{10mm}
+
+\noindent\textbf{Date:} \rule{4cm}{0.4pt}
+
+\vspace{5mm}
+
+\noindent\textbf{Place:} \rule{4cm}{0.4pt}
+
+}
+
+\clearpage
+
+%----------------------------------------------------------------------------------------
+%	DECLARATION PAGE
+%	Your institution may give you a different text to place here
+%----------------------------------------------------------------------------------------
+
+
+\Declaration{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
+
+
+%\begin{center}
+%\LARGE{\underline{\textbf{Declaration of Originality}}}
+%\end{center}
+\noindent We, the undersigned students, hereby declare that the material presented
+in the Project Report titled \textit{``CausalTrace: Runtime Container Defense
+via Kernel Invariants and Sheaf Coupling''} represents original work carried
+out by us
+in the Department of Computer Science and Engineering at the Indian Institute
+of Information Technology, Design and Manufacturing, Kurnool during the
+academic year \textbf{2025--2026}. With our signatures, we certify that:
+\begin{itemize}
+    \item We have not manipulated any of the data or results.\\[-10mm]
+    \item We have not committed any plagiarism of intellectual
+          property.\\[-10mm]
+    \item We have clearly indicated and referenced the contributions of
+          others.\\[-10mm]
+    \item We have explicitly acknowledged all collaborative research
+          and discussions.\\[-10mm]
+    \item We understand that any false claim will result in severe
+          disciplinary action.\\[-10mm]
+    \item We understand that the work may be screened for any form
+          of academic {misconduct}.
+\end{itemize}
+
+\vspace{10mm}
+
+\noindent\begin{tabular}{@{}p{0.55\textwidth}p{0.35\textwidth}@{}}
+Shubhankar Bhattacharya (122CS0047) & Signature \\[6mm]
+Anmol Kashyap (122CS0039)           & Signature \\
+\end{tabular}
+
+\vspace{6mm}
+
+\noindent Date: \rule{4cm}{0.4pt}
+
+\vspace{10mm}
+
+\noindent In my capacity as supervisor of the above-mentioned work, I certify
+that the work presented in this Report is carried out under my supervision,
+and is worthy of consideration for the requirements of B.Tech.\ Project work.
+
+\vspace{10mm}
+
+\noindent Supervisor's Name: \textbf{Dr.\ Anil Kumar R} \hfill Supervisor's Signature:
+\rule{4cm}{0.4pt}
+}
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT PAGE
+%----------------------------------------------------------------------------------------
+
+\addtotoc{Abstract} % Add the "Abstract" page entry to the Contents
+
+\abstract{\addtocontents{toc}{\vspace{1em}}
+
+Runtime security for containerised workloads sits between two surfaces: the
+kernel, which observes every syscall, and the user-space control plane,
+which observes none of them fast enough to matter. Rule-based eBPF agents
+such as Falco and Tetragon read single syscalls in isolation and flag
+payloads; they cannot see the \emph{edges} of a multi-step chain that
+pivots between containers.
+
+This thesis presents \textbf{CausalTrace}, a three-tier runtime defence
+built to close that gap. Tier~1 attaches a tail-call dispatcher to the raw
+\texttt{sys\_enter} tracepoint and drives six in-kernel invariant
+handlers---fork acceleration, execve, sensitive-file, privilege escalation,
+a \texttt{dup2} file-descriptor-type check, and namespace transition. A
+compound gate routes each breach through a strict, self-inflicted, or
+trust-gated case, and burns the attacker's IP into a TC classifier that
+drops their packets at the veth. Tier~2 stitches accepted TCP flows to
+their remote peer and promotes trust on an L4-stability test. Tier~3
+projects each container's syscall bigram into a 74-dimensional signal,
+applies canonical-correlation restriction maps at rank $k=15$, and
+computes Mahalanobis edge energies plus a global Rayleigh quotient over a
+cellular sheaf Laplacian. Four theorems tie the approach to the system:
+invariant necessity, bigram-noise adversarial closure, two-layer
+completeness, and trust-promotion soundness.
+
+Evaluation replays a fixed-seed permutation of 155 attack injections
+(150~in-distribution drawn from eleven classes, 5 held-out
+\texttt{memfd\_create} fileless payloads) against every detector under an
+identical workload on a 22-container mesh. CausalTrace catches 154 of the
+155 injections (99.4\,\% [96, 100]); Falco tuned reaches 70.3\,\% [63, 77]
+and Tetragon tuned reaches 1.3\,\% [0, 5]. Cross-container lateral
+movement, chained SSRF~$\rightarrow$~RCE, and fileless out-of-distribution
+payloads are detected at 100\,\% while every rule-based baseline misses
+them entirely. Chapter~\ref{Chapter6} reports the full per-scenario
+breakdown with Wilson 95\,\% confidence intervals.
+}
+
+\clearpage % Start a new page
+
+%----------------------------------------------------------------------------------------
+%	ACKNOWLEDGEMENTS
+%----------------------------------------------------------------------------------------
+
+\setstretch{1.3} % Reset the line-spacing to 1.3 for body text (if it has changed)
+
+\acknowledgements{\addtocontents{toc}{\vspace{1em}} % Add a gap in the Contents, for aesthetics
+
+We extend our sincere thanks to our supervisor Dr.\ Anil Kumar R,
+Assistant Professor (Grade-I), Department of Computer Science and
+Engineering, IIITDM Kurnool, for his guidance, patience, and the regular
+reviews that kept this project on course through its full length. His
+feedback at every stage improved both the technical direction of the work
+and the clarity of its presentation.
+
+We also thank the Department of Computer Science and Engineering and the
+Indian Institute of Information Technology, Design and Manufacturing,
+Kurnool, for providing the academic environment in which this project was
+undertaken. We are thankful to our families for their constant support,
+and to our peers for the many discussions that shaped this work along the
+way. Any errors that remain are ours.
+
+}
+\clearpage % Start a new page
+
+%----------------------------------------------------------------------------------------
+%	LIST OF CONTENTS/FIGURES/TABLES PAGES
+%----------------------------------------------------------------------------------------
+
+\pagestyle{fancy} % The page style headers have been "empty" all this time, now use the "fancy" headers as defined before to bring them back
+
+\lhead{\emph{Contents}} % Set the left side page header to "Contents"
+\tableofcontents % Write out the Table of Contents
+
+\lhead{\emph{List of Figures}} % Set the left side page header to "List of Figures"
+\listoffigures % Write out the List of Figures
+
+\lhead{\emph{List of Tables}} % Set the left side page header to "List of Tables"
+\listoftables % Write out the List of Tables
+
+%----------------------------------------------------------------------------------------
+%	ABBREVIATIONS
+%----------------------------------------------------------------------------------------
+
+\clearpage % Start a new page
+
+\setstretch{1.5} % Set the line spacing to 1.5, this makes the following tables easier to read
+
+\lhead{\emph{Abbreviations}} % Set the left side page header to "Abbreviations"
+\listofsymbols{ll} % Include a list of Abbreviations (a table of two columns)
+{
+\textbf{BCC}   & \textbf{B}PF \textbf{C}ompiler \textbf{C}ollection \\
+\textbf{BPF}   & \textbf{B}erkeley \textbf{P}acket \textbf{F}ilter \\
+\textbf{CCA}   & \textbf{C}anonical \textbf{C}orrelation \textbf{A}nalysis \\
+\textbf{CMS}   & \textbf{C}ount-\textbf{M}in \textbf{S}ketch \\
+\textbf{eBPF}  & \textbf{e}xtended \textbf{B}erkeley \textbf{P}acket \textbf{F}ilter \\
+\textbf{FPR}   & \textbf{F}alse \textbf{P}ositive \textbf{R}ate \\
+\textbf{kprobe}& \textbf{K}ernel \textbf{Probe} \\
+\textbf{LSM}   & \textbf{L}inux \textbf{S}ecurity \textbf{M}odule \\
+\textbf{LRU}   & \textbf{L}east \textbf{R}ecently \textbf{U}sed \\
+\textbf{PCA}   & \textbf{P}rincipal \textbf{C}omponent \textbf{A}nalysis \\
+\textbf{OOD}   & \textbf{O}ut-\textbf{o}f-\textbf{D}istribution \\
+\textbf{TC}    & \textbf{T}raffic \textbf{C}ontrol (Linux) \\
+\textbf{TID}   & \textbf{T}hread \textbf{ID} \\
+\textbf{TPR}   & \textbf{T}rue \textbf{P}ositive \textbf{R}ate \\
+}
+
+%----------------------------------------------------------------------------------------
+%	PHYSICAL CONSTANTS/OTHER DEFINITIONS
+%----------------------------------------------------------------------------------------
+%
+%\clearpage % Start a new page
+%
+%\lhead{\emph{Physical Constants}} % Set the left side page header to "Physical Constants"
+%
+%\listofconstants{lrcl} % Include a list of Physical Constants (a four column table)
+%{
+%Speed of Light & $c$ & $=$ & $2.997\ 924\ 58\times10^{8}\ \mbox{ms}^{-\mbox{s}}$ (exact)\\
+%% Constant Name & Symbol & = & Constant Value (with units) \\
+%}
+
+%----------------------------------------------------------------------------------------
+%	SYMBOLS
+%----------------------------------------------------------------------------------------
+
+\clearpage % Start a new page
+
+\lhead{\emph{Symbols}} % Set the left side page header to "Symbols"
+
+\listofnomenclature{lll} % Include a list of Symbols (a two column table)
+{
+$L_F$        & cellular sheaf Laplacian over the container graph \\
+$R(x)$       & global Rayleigh quotient $x^{\!\top}\!L_F x\,/\,x^{\!\top}\!x$ \\
+$\tau$       & per-edge Mahalanobis threshold (mean $+\,4\sigma$) \\
+$\tau_{\text{global}}$ & calibrated Rayleigh threshold \\
+$d=74$       & sheaf signal dimension per container \\
+$k=15$       & CCA restriction-map rank \\
+$\alpha=0.02$& EMA smoothing factor \\
+$B,\Delta$   & bytes-budget and duration gate for trust promotion \\
+}
+
+%----------------------------------------------------------------------------------------
+%	DEDICATION
+%----------------------------------------------------------------------------------------
+%
+\setstretch{1.3} % Return the line spacing back to 1.3
+%
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+%----------------------------------------------------------------------------------------
+%THESIS CONTENT - CHAPTERS
+%----------------------------------------------------------------------------------------
+\mainmatter % Begin numeric (1,2,3...) page numbering
+\pagestyle{fancy} 
+
+
+\input{chap_1}
+\input{chap_2} 
+\input{chap_3}
+\input{chap_4} 
+\input{chap_5} 
+\input{chap_6} 
+\input{chap_7} 
+
+%----------------------------------------------------------------------------------------
+%THESIS CONTENT - APPENDICES
+%----------------------------------------------------------------------------------------
+\addtocontents{toc}{\vspace{2em}} 
+\appendix 
+\input{app_1}
+\input{app_2}
+\input{app_3}
+
+\addtocontents{toc}{\vspace{2em}} % Add a gap in the Contents, for aesthetics
+
+\backmatter
+
+%----------------------------------------------------------------------------------------
+%BIBLIOGRAPHY
+%----------------------------------------------------------------------------------------
+\nocite{*}
+\label{Bibliography}
+
+\lhead{\emph{Bibliography}} % Change the page header to say "Bibliography"
+
+\bibliographystyle{IEEEtran} % Use the "custom" BibTeX style for formatting the Bibliography
+
+\bibliography{Bibliography} % The references (bibliography) information are stored in the file named "Bibliography.bib"
+
+\end{document}  

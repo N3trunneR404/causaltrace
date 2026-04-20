@@ -1,0 +1,23 @@
+#!/bin/bash
+# Scenario 6: Privilege Escalation
+# Expected: ALERT_PRIVESC (setuid(0) → SIGKILL)
+# Also tests: unshare(CLONE_NEWCGROUP) → pending_cgroup_inherit registration
+set -e
+echo "=== SCENARIO 6: Privilege Escalation ==="
+
+echo "Attempting unshare --user --mount..."
+docker exec ct-webapp-a unshare --user --mount /bin/sh -c 'whoami' 2>&1 || true
+echo "  Exit code: $?"
+
+echo "Attempting setuid(0) via python..."
+docker exec ct-webapp-a python3 -c "
+import os
+try:
+    os.setuid(0)
+    print('setuid(0) succeeded (should not reach here)')
+except:
+    print('setuid(0) failed or process killed')
+" 2>&1 || true
+echo "  Exit code: $?"
+
+echo "=== Scenario 6 complete ==="

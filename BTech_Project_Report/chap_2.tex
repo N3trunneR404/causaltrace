@@ -1,0 +1,207 @@
+\chapter{Literature Review and Research Gaps}
+\label{Chapter2}
+\lhead{Chapter 2. \emph{Literature Review and Gaps}}
+
+Prior work on container runtime security falls into four groups: production
+rule engines, anomaly-based syscall detectors, in-kernel enforcers, and
+cross-container research. Each group solves a real problem, and each leaves
+a specific gap that CausalTrace is engineered to close. We frame the review
+around those gaps.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Production runtime security tools}
+\label{sec:lit-production}
+%─────────────────────────────────────────────────────────────────────────────
+
+Three open-source tools dominate the production market. Falco~\cite{falco2024}
+matches kernel events against a YAML rule library through a modern-eBPF
+probe. Tetragon~\cite{tetragon2024}, a sub-project of
+Cilium~\cite{cilium2024}, compiles \emph{TracingPolicies} to eBPF kprobes and
+supports in-kernel enforcement through signal delivery and socket override.
+Tracee~\cite{tracee2024} focuses on forensics: it emits events for post-hoc
+analysis rather than enforcing in the hot path.
+
+All three operate on per-container streams. Rules match inside one
+container's own syscall trace or against a deny-list; there is no primitive
+that expresses \emph{container $A$ spawns a shell within five seconds of
+container $B$ connecting to a previously-unseen port}. A correlation layer
+can be built on top of any of them, but the round-trip to userspace that
+the layer forces up wipes out the latency advantage that in-kernel detection
+was supposed to provide.
+
+Ghimire~\emph{et al.}~\cite{ghimire2025patrol} (eBPF-PATROL) are the closest
+published baseline to our Tier~1 design. They intercept six dangerous
+syscalls (\texttt{clone}, \texttt{execve}, \texttt{openat}, \texttt{setns},
+\texttt{unshare}, \texttt{ptrace}) and enforce through BPF LSM hooks at
+$\sim$100\,ns and \texttt{bpf\_override\_return} at $\sim$200\,ns. They
+miss the same cross-container class that Falco and Tetragon miss, and they
+require a twelve-entry infrastructure whitelist (documented by them and
+reproduced in our own mid-review) to keep Docker's own runtime from
+tripping the rules.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Anomaly-based syscall detectors}
+\label{sec:lit-bosc}
+%─────────────────────────────────────────────────────────────────────────────
+
+The Bag-of-System-Calls (BoSC) family represents a container's behaviour as
+a frequency vector over syscall opcodes. Bertinatto~\emph{et
+al.}~\cite{bertinatto2024} attach a raw tracepoint to \texttt{sys\_enter},
+filter by mount namespace, and build per-process BoSC vectors. The method
+cleanly catches one hardcoded container-escape pattern
+(\texttt{openat("/proc/1/ns/mnt")} followed by
+\texttt{setns(CLONE\_NEWNS)}) and misses every other class of attack.
+
+Autoencoder-based detectors~\cite{kotenko2024,desilva2022micro,xia2024selfsup}
+and sequence models~\cite{chen2021lstm,fournier2023lm} lift this work by
+learning a density estimate over benign traces. They share the structural
+weakness: the model learns the \emph{marginal} distribution per container
+but not the joint structure between containers, so an attacker whose
+individual syscall frequencies stay close to the marginal can compose an
+attack whose joint signature is far from any single container's
+calibrated regime.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{In-kernel enforcement and adversarial evasion}
+\label{sec:lit-enforcement}
+%─────────────────────────────────────────────────────────────────────────────
+
+A smaller body of work targets enforcement in kernel space. Zhang~\emph{et
+al.}~\cite{zhang2024rtids} build a neural-network inference engine that
+runs inside eBPF through tail calls and integer arithmetic, reporting F1
+scores of 0.933 and 0.992 on packet-level intrusion datasets with 5\,KB of
+in-kernel memory. The design is elegant at the verifier boundary, but the
+detection target is packet flows, not multi-container chains.
+
+Takabayashi and Mambo~\cite{takabayashi2024evasion} study the adversarial
+other side: how an attacker can \emph{evade} eBPF-based detectors by
+\texttt{LD\_PRELOAD}-rewriting syscall arguments, hiding process files
+through \texttt{getdents} rewriting, or dropping payload packets through
+XDP. Their evasion results motivate the strict-invariant design
+philosophy of CausalTrace's Tier~1: we hook on physical contract violations
+(a process whose standard input points to a socket is a reverse shell) that
+the attacker cannot semantically rewrite away.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Cross-container attack research}
+\label{sec:lit-cross}
+%─────────────────────────────────────────────────────────────────────────────
+
+He~\emph{et al.}~\cite{he2023cross} document the cross-container attack
+class. They catalogue five vulnerable online services in which offensive
+eBPF features break container isolation, and three cloud providers' default
+Kubernetes clusters vulnerable to cross-node attacks. Their contribution is
+attack discovery; they propose no defender.
+
+Zhang~\emph{et al.}~\cite{zhang2025path} (Pamir-Detector) monitors
+path-resolution syscalls for filesystem-isolation bypasses (symlink attacks,
+procfs traversal, host-process-mediated file access). Their coverage is
+one escape family; CausalTrace's Tier~1 handlers cover complementary
+families (socket-stdio reverse shells, namespace manipulation, setuid-0
+from non-root). No published defender models the joint behaviour of
+multiple containers mathematically and detects composite attacks that never
+trip a single-container rule. That is the gap this thesis closes.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Mathematical foundations}
+\label{sec:lit-math}
+%─────────────────────────────────────────────────────────────────────────────
+
+The Tier~3 detector reuses four classical constructions as stated; no new
+mathematical theorems about them are claimed.
+
+Canonical-correlation analysis~\cite{hotelling1936} supplies the restriction
+maps $F_u, F_v$ per edge of the communication graph. The Mahalanobis
+distance~\cite{mahalanobis1936} scores residuals against the learned
+coupling covariance. The Count-Min Sketch~\cite{cormode2005cms} gives our
+in-kernel bigram counter at $4 \times 128$ per container. Cellular-sheaf
+spectral theory~\cite{hansen2019spectral,curry2014sheaves,robinson2014topological}
+provides the sheaf Laplacian~$L_F$ and the Rayleigh-quotient interpretation
+as a coupling-consistency measure. The sheaf specialises to the ordinary
+graph Laplacian of spectral graph theory~\cite{chung1997spectral} whenever
+every restriction map is the identity.
+
+%─────────────────────────────────────────────────────────────────────────────
+\section{Capability matrix and research gaps}
+\label{sec:gaps}
+%─────────────────────────────────────────────────────────────────────────────
+
+Table~\ref{tab:capability-matrix} summarises where each reviewed system sits
+against the capabilities we consider essential for defending a composite
+cross-container attack. A single row is filled in by CausalTrace.
+
+\begin{table}[t]
+\centering
+\caption[Capability matrix of reviewed runtime security systems]
+{Capabilities of reviewed runtime security systems. \ding{51}\,=\,full,
+$\sim$\,=\,partial, \ding{55}\,=\,absent. $^{\dagger}$In-kernel enforcement
+is possible via \texttt{bpf\_send\_signal} but is community-discouraged in
+production because it terminates the entire container process.}
+\label{tab:capability-matrix}
+\footnotesize
+\setlength\tabcolsep{3.5pt}
+\begin{tabular}{@{}l c c c c c c@{}}
+\toprule
+System & Cross- & Kernel- & Sub-$\mu$s & OOD & No labelled & Attacker-IP \\
+       & container & native enf. & latency & detect. & train data & severance \\
+\midrule
+Falco~\cite{falco2024}          & \ding{55} & \ding{55}$^{\dagger}$ & \ding{55} & \ding{55} & \ding{51} & \ding{55} \\
+Tetragon~\cite{tetragon2024}    & \ding{55} & $\sim$    & \ding{51} & \ding{55} & \ding{51} & \ding{55} \\
+Tracee~\cite{tracee2024}        & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{51} & \ding{55} \\
+BoSC~\cite{bertinatto2024}      & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55} & \ding{55} \\
+eBPF-PATROL~\cite{ghimire2025patrol}
+                                & \ding{55} & \ding{51} & \ding{51} & \ding{55} & \ding{51} & \ding{55} \\
+LSTM~/~LM~\cite{chen2021lstm,fournier2023lm}
+                                & \ding{55} & \ding{55} & \ding{55} & $\sim$    & \ding{55} & \ding{55} \\
+Pamir-Detector~\cite{zhang2025path}
+                                & \ding{55} & \ding{51} & \ding{51} & \ding{55} & \ding{51} & \ding{55} \\
+\textbf{CausalTrace (this work)}
+                                & \textbf{\ding{51}} & \textbf{\ding{51}}
+                                & \textbf{\ding{51}} & \textbf{\ding{51}}
+                                & \textbf{\ding{51}} & \textbf{\ding{51}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+From this matrix and the preceding review we distil five research gaps.
+
+\paragraph{G1 --- Semantic blindness of rule-based detectors.}
+Baseline~B (our mid-review Modified PATROL) detected all five attack classes
+but required twelve infrastructure whitelist entries
+(\texttt{apt-get}, \texttt{gpgv}, \texttt{runc}, \texttt{containerd}, and
+eight others) to keep normal Docker operations from tripping the rules. Each
+entry is both a maintenance burden and an evasion vector. The gap is
+semantic: identical syscalls have different intent depending on context,
+and no amount of rule tuning closes a gap that lives in meaning rather than
+syntax.
+
+\paragraph{G2 --- No cross-container chain detection.}
+Every reviewed defender operates on per-container events. Multi-stage
+chains---Log4Shell in a webapp, Dirty-Pipe for privilege escalation, a
+cgroup escape to the host---are invisible to a single-event monitor because
+each stage is locally plausible. He~\emph{et al.}~\cite{he2023cross}
+document the attack class and propose no defender.
+
+\paragraph{G3 --- Userspace enforcement bottleneck.}
+PATROL-class architectures route every decision through a userspace Go
+controller: eBPF probe $\rightarrow$ ring buffer $\rightarrow$ controller
+$\rightarrow$ \texttt{kill()}. Mid-review measurements on that path
+recorded approximately $23\,\mu$s round-trip; the triggering syscall
+completes before the kill arrives.
+
+\paragraph{G4 --- Coarse enforcement target.}
+Kernel-native enforcement delivered through \texttt{bpf\_send\_signal(SIGKILL)}
+targets the container process itself. In a deployment serving legitimate
+users alongside the attacker, this is collateral damage---every in-flight
+request terminates the moment an invariant fires. No reviewed system
+severs at attacker-IP granularity.
+
+\paragraph{G5 --- No mathematical model of inter-container coupling.}
+The object that encodes \emph{which containers may communicate, at what
+cadence, and with what joint syscall distribution} is absent from every
+reviewed system. BoSC operates on per-container marginals; network
+detectors operate on per-flow features; neither captures the joint
+structure that a sheaf Laplacian makes explicit.
+
+Chapters~\ref{Chapter3}--\ref{Chapter6} close these five gaps, respectively
+through the math, the architecture, the implementation, and the evaluation.

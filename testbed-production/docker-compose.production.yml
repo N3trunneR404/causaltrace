@@ -1,0 +1,326 @@
+version: '3.8'
+
+networks:
+  prod-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.22.0.0/16
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "true"
+    enable_ipv6: false
+
+services:
+  nginx-lb:
+    image: nginx:1.24
+    container_name: ct-prod-nginx
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.10
+    ports:
+      - "9080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    depends_on:
+      - webapp-a
+      - webapp-b
+    restart: unless-stopped
+
+  webapp-a:
+    build:
+      context: ./webapp
+    container_name: ct-prod-webapp-a
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.11
+    ports:
+      - "9081:8080"
+    environment:
+      - APP_NAME=webapp-a
+      - LOG4J_FORMAT_MSG_NO_LOOKUPS=false
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  webapp-b:
+    build:
+      context: ./webapp
+    container_name: ct-prod-webapp-b
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.12
+    environment:
+      - APP_NAME=webapp-b
+      - LOG4J_FORMAT_MSG_NO_LOOKUPS=false
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  api-gateway:
+    build:
+      context: ./services
+    container_name: ct-prod-api-gw
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.13
+    environment:
+      - APP_NAME=api-gateway
+      - APP_PORT=8000
+      - UPSTREAM_ROUTES=products:172.22.0.14:8080,orders:172.22.0.16:8080,payments:172.22.0.17:8080,users:172.22.0.18:8080
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  product-service:
+    build:
+      context: ./services
+    container_name: ct-prod-product
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.14
+    environment:
+      - APP_NAME=product-service
+      - APP_PORT=8080
+      - DB_HOST=172.22.0.21
+      - REDIS_HOST=172.22.0.20
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  inventory-service:
+    build:
+      context: ./services
+    container_name: ct-prod-inventory
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.15
+    environment:
+      - APP_NAME=inventory-service
+      - APP_PORT=8080
+      - DB_HOST=172.22.0.21
+      - KAFKA_HOST=172.22.0.23
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  order-service:
+    build:
+      context: ./services
+    container_name: ct-prod-order
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.16
+    environment:
+      - APP_NAME=order-service
+      - APP_PORT=8080
+      - PAYMENT_HOST=172.22.0.17
+      - INVENTORY_HOST=172.22.0.15
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  payment-service:
+    build:
+      context: ./webapp
+    container_name: ct-prod-payment
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.17
+    environment:
+      - APP_NAME=payment-service
+      - DB_HOST=172.22.0.21
+      - DB_PASS=payment_secret_2026
+      - PAYMENT_KEY=sk_live_fake_key_123
+      - LOG4J_FORMAT_MSG_NO_LOOKUPS=false
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  user-service:
+    build:
+      context: ./services
+    container_name: ct-prod-user
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.18
+    environment:
+      - APP_NAME=user-service
+      - APP_PORT=8080
+      - DB_HOST=172.22.0.21
+      - LDAP_HOST=172.22.0.25
+      - LDAP_PORT=389
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  notification-svc:
+    build:
+      context: ./services
+      dockerfile: Dockerfile.python
+    container_name: ct-prod-notification
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.19
+    environment:
+      - APP_NAME=notification-svc
+      - KAFKA_HOST=172.22.0.23
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  redis-cache:
+    image: redis:7-alpine
+    container_name: ct-prod-redis
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.20
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  postgres-main:
+    image: postgres:15
+    container_name: ct-prod-postgres
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.21
+    environment:
+      - POSTGRES_DB=appdb
+      - POSTGRES_USER=appuser
+      - POSTGRES_PASSWORD=apppass_2026
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: ct-prod-kafka
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.23
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 172.22.0.24:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://172.22.0.23:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    depends_on:
+      - zookeeper
+    restart: unless-stopped
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: ct-prod-zookeeper
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.24
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  attacker-ldap:
+    build:
+      context: ./attacker
+    container_name: ct-prod-attacker-ldap
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.25
+    ports:
+      - "1389:1389"
+      - "8888:8888"
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: ct-prod-prometheus
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.26
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: ct-prod-grafana
+    networks:
+      prod-net:
+        ipv4_address: 172.22.0.27
+    security_opt:
+      - seccomp:unconfined
+    cap_add:
+      - SYS_PTRACE
+      - NET_ADMIN
+      - SYS_ADMIN
+    restart: unless-stopped

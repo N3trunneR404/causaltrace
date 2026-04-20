@@ -1,0 +1,13 @@
+{"tool": "tetragon", "scenario": "S1", "script": "scenario_1_normal.sh", "ts_inject": 1776593414.7172089, "ts_done": 1776593434.8308809, "exit_code": 125, "expect_detection": false}
+{"tool": "tetragon", "scenario": "S2", "script": "scenario_2_reverse_shell.sh", "ts_inject": 1776593442.9968345, "ts_done": 1776593463.1111355, "exit_code": 125, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S2a", "script": "scenario_2a_evade.sh", "ts_inject": 1776593471.255487, "ts_done": 1776593472.3576055, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S3", "script": "scenario_3_sensitive_file.sh", "ts_inject": 1776593480.491757, "ts_done": 1776593480.5932176, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S3a", "script": "scenario_3_evade.sh", "ts_inject": 1776593488.7766788, "ts_done": 1776593488.8782725, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S4", "script": "scenario_4_fork_bomb.sh", "ts_inject": 1776593497.035754, "ts_done": 1776593497.2375143, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S5", "script": "scenario_5_ns_escape.sh", "ts_inject": 1776593505.3936367, "ts_done": 1776593505.4951394, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S6", "script": "scenario_6_privesc.sh", "ts_inject": 1776593513.6742668, "ts_done": 1776593513.7758448, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S7", "script": "scenario_7_cross_container.sh", "ts_inject": 1776593521.9545023, "ts_done": 1776593527.659487, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S8", "script": "scenario_8_log4shell.sh", "ts_inject": 1776593535.835387, "ts_done": 1776593539.939333, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S9", "script": "scenario_9_ssrf_rce.sh", "ts_inject": 1776593548.1123788, "ts_done": 1776593553.8173428, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S10", "script": "scenario_10_container_escape.sh", "ts_inject": 1776593561.9961584, "ts_done": 1776593567.2007298, "exit_code": 0, "expect_detection": true}
+{"tool": "tetragon", "scenario": "S11", "script": "scenario_11_fileless_memfd.sh", "ts_inject": 1776593575.3734457, "ts_done": 1776593576.9761136, "exit_code": 0, "expect_detection": true}

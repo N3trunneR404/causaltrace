@@ -1,0 +1,55 @@
+# --- ignore folder (PDFs, ppts, mid-project docs, chat logs) ---
+ignore/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# Build artefacts
+*.o
+*.so
+*.ko
+*.a
+*.d
+
+# LaTeX build artefacts
+BTech_Project_Report/*.aux
+BTech_Project_Report/*.log
+BTech_Project_Report/*.out
+BTech_Project_Report/*.toc
+BTech_Project_Report/*.lof
+BTech_Project_Report/*.lot
+BTech_Project_Report/*.bbl
+BTech_Project_Report/*.blg
+BTech_Project_Report/*.synctex.gz
+BTech_Project_Report/*.fls
+BTech_Project_Report/*.fdb_latexmk
+
+# Runtime / daemon artefacts
+*.pid.txt
+driver.pid.txt
+loader.pid.txt
+cgroup_snapshot.json
+driver.log
+driver_report.json
+
+# Old calibration snapshots (pre-/broken- dirs)
+calibration.pre-*/
+calibration.broken*/
+
+# Docker / system
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Large PDFs that are not the final thesis
+BTech_Thesis_eBPF*.pdf
+
+# Background docs (design documents, arch state notes — keep in repo root for reference)
+# Uncomment below if you want to exclude them:
+# *.md (don't — README and QUICKSTART must stay)

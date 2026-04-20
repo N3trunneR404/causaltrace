@@ -1,0 +1,13 @@
+{"tool": "falco", "scenario": "S1", "script": "scenario_1_normal.sh", "ts_inject": 1776593233.162725, "ts_done": 1776593253.275946, "exit_code": 125, "expect_detection": false}
+{"tool": "falco", "scenario": "S2", "script": "scenario_2_reverse_shell.sh", "ts_inject": 1776593261.4056718, "ts_done": 1776593281.5189095, "exit_code": 125, "expect_detection": true}
+{"tool": "falco", "scenario": "S2a", "script": "scenario_2a_evade.sh", "ts_inject": 1776593289.6614485, "ts_done": 1776593290.7634614, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S3", "script": "scenario_3_sensitive_file.sh", "ts_inject": 1776593298.9075582, "ts_done": 1776593299.0094411, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S3a", "script": "scenario_3_evade.sh", "ts_inject": 1776593307.1755931, "ts_done": 1776593307.2771244, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S4", "script": "scenario_4_fork_bomb.sh", "ts_inject": 1776593315.4488885, "ts_done": 1776593315.650705, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S5", "script": "scenario_5_ns_escape.sh", "ts_inject": 1776593323.816587, "ts_done": 1776593323.9182167, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S6", "script": "scenario_6_privesc.sh", "ts_inject": 1776593332.0656269, "ts_done": 1776593332.167365, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S7", "script": "scenario_7_cross_container.sh", "ts_inject": 1776593340.3356602, "ts_done": 1776593346.0406058, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S8", "script": "scenario_8_log4shell.sh", "ts_inject": 1776593354.2211854, "ts_done": 1776593358.3251266, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S9", "script": "scenario_9_ssrf_rce.sh", "ts_inject": 1776593366.490314, "ts_done": 1776593372.195245, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S10", "script": "scenario_10_container_escape.sh", "ts_inject": 1776593380.3373542, "ts_done": 1776593385.5418706, "exit_code": 0, "expect_detection": true}
+{"tool": "falco", "scenario": "S11", "script": "scenario_11_fileless_memfd.sh", "ts_inject": 1776593393.7139132, "ts_done": 1776593395.3163426, "exit_code": 0, "expect_detection": true}

@@ -1,0 +1,113 @@
+# CI — fast, static-only checks that don't require a kernel with BPF.
+#
+# We intentionally do NOT try to load the BPF program in CI: the runner's
+# kernel is not guaranteed to support our helpers (bpf_ringbuf_query,
+# bpf_send_signal, SCHED_CLS direct-action), and installing BCC inside
+# GitHub Actions is flaky. Live-load coverage happens on the developer's
+# host via scripts/minirun.sh.
+#
+# What this workflow does catch:
+#   - Python syntax errors anywhere in the tree.
+#   - ruff lint failures on tier3/ and infra/ (our Python deliverables).
+#   - Shell syntax errors (bash -n) on every *.sh.
+#   - Import-level smoke tests for the pure-Python modules.
+#   - The calibration validator runs against a fixture to prove its
+#     error paths work.
+#
+# Runs on push to any branch and on every PR.
+
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  static:
+    name: Static checks (Python + shell)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install Python dev deps
+        run: |
+          python -m pip install --upgrade pip
+          # Minimal: we only need what lets the pure-Python modules import.
+          pip install numpy scikit-learn scipy matplotlib seaborn \
+                      pydantic pyroute2 pytest ruff
+
+      - name: Python syntax check (entire repo)
+        run: |
+          # Every .py must parse. This catches paste errors that
+          # shadow the slower ruff pass.
+          git ls-files '*.py' | xargs -r python -m py_compile
+
+      - name: ruff lint (tier3/ + infra/)
+        run: |
+          ruff check tier3/ infra/ supervisor.py
+
+      - name: Shell syntax check (bash -n)
+        run: |
+          # Every shell script has to at least parse. Hard-fails on any
+          # malformed script — these are runnable by root on production
+          # boxes so we care about correctness even if ShellCheck isn't run.
+          failed=0
+          for f in $(git ls-files '*.sh'); do
+            if ! bash -n "$f"; then
+              echo "SYNTAX FAIL: $f"
+              failed=1
+            fi
+          done
+          exit $failed
+
+      - name: Import-level smoke tests
+        run: |
+          # The pure-Python tier3 modules must import cleanly under the
+          # source tree (no circular imports, no missing deps).
+          python - <<'PY'
+          import importlib, sys
+          sys.path.insert(0, "tier3")
+          sys.path.insert(0, "infra")
+          for m in [
+              "trust_promoter",
+              "ringbuf_monitor",
+              "ema_buffer",
+              "calibration_driver",
+              "cgroup_snapshot",
+          ]:
+              importlib.import_module(m)
+              print(f"imported: {m}")
+          PY
+
+      - name: calibration_driver error paths
+        run: |
+          # Validator must FAIL on an empty dir (6 missing files) and on
+          # a non-existent path. Catches regression in the CLI wiring.
+          set -e
+          mkdir -p /tmp/ct-empty
+          rc=0
+          python -m tier3.calibration_driver /tmp/ct-empty || rc=$?
+          test "$rc" -eq 1 || { echo "validator should exit 1 on empty dir"; exit 1; }
+          rc=0
+          python -m tier3.calibration_driver /tmp/__does_not_exist__ || rc=$?
+          test "$rc" -eq 1 || { echo "validator should exit 1 on missing path"; exit 1; }
+          echo "validator error paths OK"
+
+      - name: pytest (if any tests exist)
+        run: |
+          # Soft: only fail if tests exist AND they fail.
+          if git ls-files 'tests/**' 'test_*.py' '**/test_*.py' | grep -q .; then
+            pytest -q
+          else
+            echo "no tests yet — skipping"
+          fi

@@ -1,0 +1,73 @@
+# config/causaltrace.yaml — runtime config for the CausalTrace daemon.
+#
+# Values here are read at daemon startup. They do NOT override kernel
+# constants — anything that affects the BPF program's verifier state
+# must be changed in kernel/causaltrace_bcc.c and recompiled.
+#
+# Keep this file minimal: only expose knobs that operators actually
+# need to tune. Each entry documents WHY the default was chosen so that
+# out-of-the-box behavior is defensible.
+
+detection:
+  # Tier 3 detection cycle. 5 s is a compromise between responsiveness
+  # and cost: shorter -> higher CPU, not enough syscall volume for a
+  # meaningful CMS window; longer -> slow-drip attacks accumulate more
+  # data per cycle but mean-time-to-kill grows.
+  interval_seconds: 5.0
+
+  # Drop connection events older than this. Protects against the
+  # "daemon behind" death spiral where backlogged events poison current
+  # detection. Monotonic time.
+  staleness_ttl_seconds: 10.0
+
+calibration:
+  # Total wall-clock time calibration runs. 10 min is enough to
+  # accumulate ≥120 bigram windows per container (min 60 required for
+  # stable CCA; we want headroom). Tune up if containers are idle.
+  duration_seconds: 600
+
+  # Expected PCA explained-variance floor. Validator fails below this.
+  pca_min_explained_variance: 0.90
+
+  # CCA shared-coupling dimension. See the docstring in calibrate.py —
+  # k=15 keeps cov well-conditioned and tightens the chi-squared 4σ tail.
+  cca_k: 15
+
+trust:
+  # L4-stability gate: a single flow must carry at least this many bytes
+  # AND have been alive for at least this long before an IP advances
+  # from OBSERVED to CALIBRATED. 5120 B / 1 s rejects brief scanners
+  # while permitting normal HTTP/TLS conversations.
+  bytes_min:                5120
+  duration_ns:              1000000000     # 1.0 s
+  # Case C drop_ip_list TTL. Attacker flows stay severed this long
+  # after the last trip; false positives heal automatically.
+  drop_ttl_seconds:         300
+
+ema:
+  # Guarded EMA for slow-drip detection. alpha=0.02 => half-life ~170 s.
+  # pristine_min_cycles guards the blend — baseline only updates when
+  # the system has been clean for ≥ this many consecutive cycles.
+  alpha:                    0.02
+  pristine_min_cycles:      6       # 30 s at interval_seconds=5
+
+ringbuf:
+  # Proactive shed threshold for telemetry_rb. Must match the kernel-
+  # side constant TELEMETRY_RB_BYTES * 9/10 — this field is advisory
+  # for operators; changing it here does NOT change kernel behavior.
+  telemetry_shed_fill_ratio: 0.90
+  alerts_nearfull_ratio:     0.80
+
+paths:
+  calibration_dir:        "calibration"
+  results_dir:            "results/causaltrace"
+  bpf_pin_dir:            "/sys/fs/bpf/causaltrace"
+
+operations:
+  # Crash-loop guard used by supervisor.py.
+  supervisor:
+    max_crashes_per_window: 5
+    crash_window_seconds:   600
+    sigterm_grace_seconds:  8
+    backoff_base_seconds:   2
+    backoff_cap_seconds:    60

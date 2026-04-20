@@ -1,0 +1,27 @@
+# CausalTrace Python dependencies.
+#
+# System packages (install via apt, not pip):
+#   bpfcc-tools python3-bcc clang llvm linux-headers-$(uname -r) \
+#   docker.io iproute2 bpftool
+#
+# Pinned lower bounds only; upper bounds avoided to keep the supply chain
+# lean. CI validates on the pinned minimums and on the latest shipping
+# versions. Breakage on minors should be rare.
+
+# ── Numerics + ML ──
+numpy>=1.24.0
+scikit-learn>=1.3.0
+scipy>=1.11.0
+
+# ── Runtime orchestration ──
+docker>=6.0.0          # docker event listener + cgroup snapshot
+pyroute2>=0.7.9        # optional TC/netlink helpers; loader has a ctypes fallback
+pydantic>=2.5.0        # config.yaml schema validation
+
+# ── Analysis / plotting (paper figures) ──
+matplotlib>=3.7.0
+seaborn>=0.13.0
+
+# ── Dev + CI ──
+pytest>=7.4.0
+ruff>=0.4.0

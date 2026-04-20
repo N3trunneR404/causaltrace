@@ -1,0 +1,52 @@
+[causaltrace] loader started pid=646780, warming up 6s
+  [causaltrace] 1/13  S1  scenario_1_normal.sh  (timeout 20s, gap 8s)
+  [causaltrace] 2/13  S2  scenario_2_reverse_shell.sh  (timeout 20s, gap 8s)
+  [causaltrace] 3/13  S2a  scenario_2a_evade.sh  (timeout 20s, gap 8s)
+  [causaltrace] 4/13  S3  scenario_3_sensitive_file.sh  (timeout 20s, gap 8s)
+  [causaltrace] 5/13  S3a  scenario_3_evade.sh  (timeout 20s, gap 8s)
+  [causaltrace] 6/13  S4  scenario_4_fork_bomb.sh  (timeout 20s, gap 8s)
+  [causaltrace] 7/13  S5  scenario_5_ns_escape.sh  (timeout 20s, gap 8s)
+  [causaltrace] 8/13  S6  scenario_6_privesc.sh  (timeout 20s, gap 8s)
+  [causaltrace] 9/13  S7  scenario_7_cross_container.sh  (timeout 20s, gap 8s)
+  [causaltrace] 10/13  S8  scenario_8_log4shell.sh  (timeout 20s, gap 8s)
+  [causaltrace] 11/13  S9  scenario_9_ssrf_rce.sh  (timeout 20s, gap 8s)
+  [causaltrace] 12/13  S10  scenario_10_container_escape.sh  (timeout 20s, gap 8s)
+  [causaltrace] 13/13  S11  scenario_11_fileless_memfd.sh  (timeout 20s, gap 8s)
+[causaltrace] loader stopped
+[falco] started pid=661782, warming up 6s
+  [falco] 1/13  S1  scenario_1_normal.sh  (timeout 20s, gap 8s)
+  [falco] 2/13  S2  scenario_2_reverse_shell.sh  (timeout 20s, gap 8s)
+  [falco] 3/13  S2a  scenario_2a_evade.sh  (timeout 20s, gap 8s)
+  [falco] 4/13  S3  scenario_3_sensitive_file.sh  (timeout 20s, gap 8s)
+  [falco] 5/13  S3a  scenario_3_evade.sh  (timeout 20s, gap 8s)
+  [falco] 6/13  S4  scenario_4_fork_bomb.sh  (timeout 20s, gap 8s)
+  [falco] 7/13  S5  scenario_5_ns_escape.sh  (timeout 20s, gap 8s)
+  [falco] 8/13  S6  scenario_6_privesc.sh  (timeout 20s, gap 8s)
+  [falco] 9/13  S7  scenario_7_cross_container.sh  (timeout 20s, gap 8s)
+  [falco] 10/13  S8  scenario_8_log4shell.sh  (timeout 20s, gap 8s)
+  [falco] 11/13  S9  scenario_9_ssrf_rce.sh  (timeout 20s, gap 8s)
+  [falco] 12/13  S10  scenario_10_container_escape.sh  (timeout 20s, gap 8s)
+  [falco] 13/13  S11  scenario_11_fileless_memfd.sh  (timeout 20s, gap 8s)
+[falco] stopped
+[tetragon] container=tetragon-unittest started, warming up 10s
+  [tetragon] 1/13  S1  scenario_1_normal.sh  (timeout 20s, gap 8s)
+  [tetragon] 2/13  S2  scenario_2_reverse_shell.sh  (timeout 20s, gap 8s)
+  [tetragon] 3/13  S2a  scenario_2a_evade.sh  (timeout 20s, gap 8s)
+  [tetragon] 4/13  S3  scenario_3_sensitive_file.sh  (timeout 20s, gap 8s)
+  [tetragon] 5/13  S3a  scenario_3_evade.sh  (timeout 20s, gap 8s)
+  [tetragon] 6/13  S4  scenario_4_fork_bomb.sh  (timeout 20s, gap 8s)
+  [tetragon] 7/13  S5  scenario_5_ns_escape.sh  (timeout 20s, gap 8s)
+  [tetragon] 8/13  S6  scenario_6_privesc.sh  (timeout 20s, gap 8s)
+  [tetragon] 9/13  S7  scenario_7_cross_container.sh  (timeout 20s, gap 8s)
+  [tetragon] 10/13  S8  scenario_8_log4shell.sh  (timeout 20s, gap 8s)
+  [tetragon] 11/13  S9  scenario_9_ssrf_rce.sh  (timeout 20s, gap 8s)
+  [tetragon] 12/13  S10  scenario_10_container_escape.sh  (timeout 20s, gap 8s)
+  [tetragon] 13/13  S11  scenario_11_fileless_memfd.sh  (timeout 20s, gap 8s)
+[tetragon] stopped
+summary → /home/s/causaltrace/unittests/summary.csv
+
+               S1    S2    S2a   S3    S3a   S4    S5    S6    S7    S8    S9    S10   S11    rate
+  causaltrace   ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     100.0%
+  falco         ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     ✓     100.0%
+  tetragon      ✗     ✗     ✗     ✗     ✗     ✗     ✗     ✗     ✓     ✓     ✓     ✓     ✓     38.5%
+matplotlib unavailable (No module named 'matplotlib'); skipping plots.

@@ -1,0 +1,19 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: cteval-dup2-fd-redirect
+spec:
+  kprobes:
+  - call: "__x64_sys_dup2"
+    syscall: true
+    args:
+    - index: 1
+      type: "int"
+    selectors:
+    - matchArgs:
+      - index: 1
+        operator: "InMap"
+        values:
+        - "0"
+        - "1"
+        - "2"

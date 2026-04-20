@@ -1,0 +1,50 @@
+# Phase 7C — logrotate policy for CausalTrace operational logs.
+#
+# Install:
+#   sudo cp config/causaltrace.logrotate /etc/logrotate.d/causaltrace
+#   sudo chown root:root /etc/logrotate.d/causaltrace
+#   sudo chmod 0644 /etc/logrotate.d/causaltrace
+#
+# Adjust the paths at the top of each stanza to match your deployment.
+# The defaults assume the daemon runs with the repo at /opt/causaltrace.
+# Every path is a glob — logrotate is tolerant of missing files.
+#
+# Policy choices:
+#   daily + rotate 14   →  two weeks of history is enough to correlate
+#                          a detection alert with post-incident forensics
+#                          while keeping disk usage bounded.
+#   compress            →  gzip old rotations.
+#   delaycompress       →  the previous rotation stays uncompressed for
+#                          one more day, so grep-in-flight is fast.
+#   copytruncate        →  the daemon keeps an open file handle on
+#                          verdicts.jsonl and supervisor.log; truncate-
+#                          in-place avoids SIGHUP signalling.
+#   notifempty          →  don't bother rotating empty files.
+#   missingok           →  tolerate the first boot where files don't
+#                          exist yet.
+
+/opt/causaltrace/results/causaltrace/verdicts.jsonl
+/opt/causaltrace/results/causaltrace/signals.jsonl
+{
+    daily
+    rotate 14
+    compress
+    delaycompress
+    copytruncate
+    notifempty
+    missingok
+    create 0640 root root
+}
+
+/opt/causaltrace/results/causaltrace/supervisor.log
+/opt/causaltrace/results/causaltrace/loader.log
+{
+    daily
+    rotate 14
+    compress
+    delaycompress
+    copytruncate
+    notifempty
+    missingok
+    create 0640 root root
+}

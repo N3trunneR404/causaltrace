@@ -1,0 +1,13 @@
+{"tool": "causaltrace", "scenario": "S1", "script": "scenario_1_normal.sh", "ts_inject": 1776593055.231726, "ts_done": 1776593075.345412, "exit_code": 125, "expect_detection": false}
+{"tool": "causaltrace", "scenario": "S2", "script": "scenario_2_reverse_shell.sh", "ts_inject": 1776593083.4994836, "ts_done": 1776593103.6130016, "exit_code": 125, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S2a", "script": "scenario_2a_evade.sh", "ts_inject": 1776593111.7558815, "ts_done": 1776593112.8580208, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S3", "script": "scenario_3_sensitive_file.sh", "ts_inject": 1776593121.0056095, "ts_done": 1776593121.1072192, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S3a", "script": "scenario_3_evade.sh", "ts_inject": 1776593129.272585, "ts_done": 1776593129.3740883, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S4", "script": "scenario_4_fork_bomb.sh", "ts_inject": 1776593137.5314903, "ts_done": 1776593137.7330117, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S5", "script": "scenario_5_ns_escape.sh", "ts_inject": 1776593145.8890822, "ts_done": 1776593145.9905927, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S6", "script": "scenario_6_privesc.sh", "ts_inject": 1776593154.1487818, "ts_done": 1776593154.2502527, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S7", "script": "scenario_7_cross_container.sh", "ts_inject": 1776593162.4224565, "ts_done": 1776593168.127368, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S8", "script": "scenario_8_log4shell.sh", "ts_inject": 1776593176.2895465, "ts_done": 1776593180.393181, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S9", "script": "scenario_9_ssrf_rce.sh", "ts_inject": 1776593188.5544894, "ts_done": 1776593194.2594256, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S10", "script": "scenario_10_container_escape.sh", "ts_inject": 1776593202.4090037, "ts_done": 1776593207.6140997, "exit_code": 0, "expect_detection": true}
+{"tool": "causaltrace", "scenario": "S11", "script": "scenario_11_fileless_memfd.sh", "ts_inject": 1776593215.7344987, "ts_done": 1776593217.336987, "exit_code": 0, "expect_detection": true}

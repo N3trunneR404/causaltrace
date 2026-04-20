@@ -1,0 +1,71 @@
+#!/bin/bash
+# Scenario 10: Container escape attempts
+#
+# Attack shape:
+#   From inside a compromised container, the attacker tries multiple
+#   well-known namespace / mount / release_agent tricks. None of these
+#   are part of a legitimate workload's syscall surface, so each one
+#   trips a rare-syscall invariant. Expectation: every single attempt
+#   lands in Case A (strict) — "see once, kill, burn trust."
+#
+# Detection chain:
+#   - Tier 1 Top-24 dispatcher: unshare(272), mount(165), setns(308),
+#     bpf(321), memfd_create(319) are all in the rare-syscall list.
+#     Any of them from an uncalibrated workload fires immediately.
+#   - Compound Gate: Case A (strict invariant) -> SIGKILL the offender,
+#     drop_ip_list the attacker IP for 5 min, client_trust -> BURNED.
+#   - Tier 3 (for CAP_SYS_ADMIN patterns): privilege escalation bits.
+#
+# MITRE ATT&CK:
+#   T1611 Escape to Host
+#   T1068 Exploitation for Privilege Escalation
+#   T1055 Process Injection (for bpf/ptrace variants)
+set -e
+echo "=== SCENARIO 10: Container escape attempts ==="
+echo ""
+
+run_attempt() {
+    local label="$1"; shift
+    echo "[Attempt] ${label}"
+    docker exec ct-web /bin/sh -c "$*" 2>&1 || true
+    echo "  Exit code: $? (137 = SIGKILL expected)"
+    sleep 1
+}
+
+# A) unshare(CLONE_NEWNS | CLONE_NEWUSER) — create user+mount namespace,
+#    the classic "map root inside, map host filesystems" trick.
+run_attempt "unshare -rm" "unshare -rm true"
+
+# B) mount /proc over container's /proc — breaks isolation of pid view.
+run_attempt "mount -t proc" "mkdir -p /tmp/hostproc && mount -t proc proc /tmp/hostproc 2>&1"
+
+# C) release_agent / core_pattern style — write a payload path into a
+#    kernel file that gets invoked with host privileges.
+run_attempt "write /proc/sys/kernel/core_pattern" \
+    "echo '|/tmp/escape.sh' > /proc/sys/kernel/core_pattern 2>&1"
+
+# D) memfd_create + fdexec — used in some escape chains to stage a
+#    payload without touching disk before setns'ing.
+run_attempt "memfd_create + exec /proc/self/fd" \
+    "python3 -c \"
+import os, ctypes
+libc = ctypes.CDLL('libc.so.6', use_errno=True)
+libc.syscall.restype = ctypes.c_int
+fd = libc.syscall(319, ctypes.c_char_p(b'pwn'), 0)  # memfd_create
+if fd >= 0:
+    os.write(fd, b'#!/bin/sh\necho pwned')
+    try: os.execl('/proc/self/fd/%d' % fd, 'pwn')
+    except: pass
+\" 2>&1"
+
+# E) bpf(2) from inside the container — should never be legitimate.
+run_attempt "bpf() syscall" \
+    "python3 -c 'import ctypes; ctypes.CDLL(\"libc.so.6\").syscall(321, 0, 0, 0)' 2>&1"
+
+echo ""
+echo "Detection layers expected per attempt:"
+echo "  Tier 1 dispatcher: rare-syscall invariant fires on each of"
+echo "    unshare / mount / memfd_create / bpf."
+echo "  Compound Gate: every attempt is Case A -> SIGKILL + burn trust."
+echo "  /proc write: BIT_SENSITIVE_WRITE (privilege escalation path)."
+echo "=== Scenario 10 complete ==="
