@@ -351,7 +351,7 @@ Full proofs: [`BTech_Project_Report/chap_5.tex`](BTech_Project_Report/chap_5.tex
 
 ## Citation
 
-Shubhankar Bhattacharya and Anmol Kashyap.
+Shubhankar Bhattacharya
 *CausalTrace: Runtime Container Defense via Kernel Invariants and Sheaf Coupling.*
 B.Tech. Project Report, IIITDM Kurnool, April 2026.
 
